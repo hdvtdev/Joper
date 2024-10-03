@@ -1,0 +1,55 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'hdvtdev'
+version = '0.0.1'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("net.dv8tion:JDA:5.1.1") {
+        exclude module: 'opus-java'
+        exclude module: 'json'
+    }
+    implementation 'io.github.cdimascio:dotenv-java:3.0.2'
+}
+
+application {
+    mainClassName = 'hdvtdev.Main'
+    mainClass = 'hdvtdev.Main'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'hdvtdev.Main'
+        )
+    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('jare', Jar) {
+    version = '0.0.1e'
+    from(sourceSets.main.output)
+    from('src/main/resources') {
+        include '.env'
+    }
+    manifest {
+        attributes(
+                'Main-Class': 'hdvtdev.Main'
+        )
+    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.register('cleanLibs', Delete) {
+    delete fileTree(dir:  "$buildDir/libs", include: ['*'])
+}
+
