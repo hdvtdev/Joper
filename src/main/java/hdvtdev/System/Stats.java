@@ -1,4 +1,4 @@
-package hdvtdev;
+package hdvtdev.System;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;

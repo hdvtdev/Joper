@@ -29,7 +29,6 @@ public class GUI {
         System.setOut(printStream);
         System.setErr(printStream);
 
-
         frame.setVisible(true);
         System.out.println("=============================================================================");
         System.out.println("\t[DisBot] [WARN] It is not recommended to use GUI mode");
