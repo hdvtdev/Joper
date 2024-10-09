@@ -12,7 +12,7 @@ import java.io.*;
 public class CSVParser {
 
     private final long startTime = System.currentTimeMillis();
-    private final String csvpath = "/home/hadvart/IdeaProjects/POI/src/main/resources/schedule.csv";
+    private final String csvpath = "/home/hadvart/IdeaProjects/POI/src/main/resources/even.csv";
     private final String xlsxpath = "/home/hadvart/IdeaProjects/POI/src/main/resources/schedule.xlsx";
 
 

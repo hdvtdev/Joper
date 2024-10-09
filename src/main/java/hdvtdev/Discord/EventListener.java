@@ -1,6 +1,7 @@
 package hdvtdev.Discord;
 
 import hdvtdev.Discord.Commands.EmbedSchedule;
+import hdvtdev.Discord.Notification.UserDataManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -35,6 +36,7 @@ public class EventListener extends ListenerAdapter {
                 System.gc();
             }
             case "schedule" -> schedule(event);
+            case "notify" -> UserDataManager.addUserData(event);
         }
 
 
@@ -42,7 +44,7 @@ public class EventListener extends ListenerAdapter {
     }
 
     private static void schedule(SlashCommandInteractionEvent event) {
-        event.replyEmbeds(new EmbedSchedule().scheduleEmbedBuilder(event.getOption("group").getAsString(), event.getOption("dayofweek").getAsString())).queue();
+        event.replyEmbeds(new EmbedSchedule().scheduleEmbedBuilder(event.getOption("group").getAsString(), event.getOption("dayofweek").getAsString(), event.getOption("week").getAsString())).queue();
     }
 
 

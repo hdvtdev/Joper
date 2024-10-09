@@ -10,7 +10,9 @@ import java.util.Map;
 
 public class ScheduleManager {
 
-    // Класс для хранения информации о паре
+    private static final String pathToEven = "src/main/resources/even.csv";
+    private static final String pathToOdd = "src/main/resources/odd.csv";
+
     static class Lesson {
         String subject;
         String room;
@@ -29,32 +31,41 @@ public class ScheduleManager {
         }
     }
 
-    public static WeeklyGroupSchedule parseSchedule(String csvFile, String targetGroup) {
+    public static WeeklyGroupSchedule parseSchedule(String targetGroup, String week) {
         boolean parsingGroup = false;
         List<String> daysOfWeek = new ArrayList<>();
         Map<String, Map<Integer, Lesson>> timetable = new HashMap<>();
+        String path;
+
+
+
+        if (week.equalsIgnoreCase("odd")) {
+            path = pathToOdd;
+        } else if (week.equalsIgnoreCase("even")) {
+            path = pathToEven;
+        } else {
+            return null;
+        }
+
+
 
         try {
-            CSVReader reader = new CSVReader(new FileReader(csvFile));
+            CSVReader reader = new CSVReader(new FileReader(path));
             String[] nextLine;
             int lessonNumber = 0;
 
             while ((nextLine = reader.readNext()) != null) {
-                // Проверка на нахождение группы
                 if (nextLine.length > 0 && nextLine[0] != null && nextLine[0].startsWith("Группа -")) {
                     String currentGroup = nextLine[0].replace("Группа - ", "").trim();
 
                     if (currentGroup.equals(targetGroup)) {
                         parsingGroup = true;
                     } else if (parsingGroup) {
-                        // Если нашли другую группу, выходим из цикла
                         break;
                     }
                 }
 
-                // Если мы начали парсить нужную группу
                 if (parsingGroup) {
-                    // Если находим заголовки с днями недели
                     if (nextLine.length > 0 && nextLine[0] != null && nextLine[0].equals("№")) {
                         daysOfWeek.clear();
                         for (int i = 1; i < nextLine.length; i += 2) {
@@ -64,7 +75,6 @@ public class ScheduleManager {
                         }
                     }
 
-                    // Если находим номер пары (идет после заголовков)
                     if (nextLine.length > 0 && nextLine[0] != null && nextLine[0].matches("\\d+")) {
                         lessonNumber = Integer.parseInt(nextLine[0]);
 
@@ -72,7 +82,6 @@ public class ScheduleManager {
                             String subject = (i < nextLine.length && nextLine[i] != null) ? nextLine[i].trim() : null;
                             String room = (i + 1 < nextLine.length && nextLine[i + 1] != null) ? nextLine[i + 1].trim() : null;
 
-                            // Создаем структуру расписания по дням и парам
                             if (!timetable.containsKey(daysOfWeek.get(dayIndex))) {
                                 timetable.put(daysOfWeek.get(dayIndex), new HashMap<>());
                             }
@@ -86,22 +95,19 @@ public class ScheduleManager {
                 }
             }
 
-            // Закрываем reader
             reader.close();
-
-            // Заполнение DailyGroupSchedule и WeeklyGroupSchedule
             DailyGroupSchedule[] dailyGroupSchedules = new DailyGroupSchedule[daysOfWeek.size()];
 
             for (int i = 0; i < daysOfWeek.size(); i++) {
                 String day = daysOfWeek.get(i);
-                ClassData[] classDataArray = new ClassData[7]; // Предполагаем максимум 7 пар в день
+                ClassData[] classDataArray = new ClassData[7];
 
                 for (int j = 1; j <= 7; j++) {
                     Lesson lesson = timetable.getOrDefault(day, new HashMap<>()).get(j);
                     if (lesson != null) {
                         classDataArray[j - 1] = new ClassData((byte) j, lesson.room, lesson.subject);
                     } else {
-                        classDataArray[j - 1] = null; // или создайте ClassData с null значениями
+                        classDataArray[j - 1] = null;
                     }
                 }
 
@@ -111,33 +117,8 @@ public class ScheduleManager {
             return new WeeklyGroupSchedule(targetGroup, dailyGroupSchedules);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
         return null;
-    }
-
-    public static void printWeeklyGroupSchedule(WeeklyGroupSchedule weeklyGroupSchedule) {
-
-        DailyGroupSchedule[] dailyGroupSchedules = weeklyGroupSchedule.dailyGroupSchedule();
-        String groupName = weeklyGroupSchedule.groupName();
-        System.out.println(groupName);
-        int classIndex = 1;
-
-        for (DailyGroupSchedule dgs : dailyGroupSchedules) {
-
-            ClassData[] classData = dgs.classData();
-            String dayOfWeek = dgs.dayOfWeek();
-            System.out.println(dayOfWeek);
-
-            for (ClassData cd : classData) {
-                if (cd == null) {
-                    System.out.println(classIndex + " нет пары.");
-                } else {
-                    System.out.println(cd.classNumber() + " " + cd.className() + " " + cd.classRoom());
-                }
-                classIndex++;
-            }
-            classIndex = 1;
-        }
     }
 }
