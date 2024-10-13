@@ -1,5 +1,6 @@
 package hdvtdev.Discord;
 
+import hdvtdev.AI.LocalModel;
 import hdvtdev.Discord.Commands.EmbedSchedule;
 import hdvtdev.Discord.Notification.UserDataManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -19,10 +20,11 @@ public class EventListener extends ListenerAdapter {
             return;
 
         if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser())) {
-            event.getMessage().reply(" иди нахуй, мамку свою пингуй.").queue();
+            String msg = event.getMessage().getContentRaw();
+            String botMention = "<@" + event.getJDA().getSelfUser().getId() + ">";
+            msg = msg.replace(botMention, "").trim();
+            event.getMessage().reply(LocalModel.getResponse(msg)).queue();
         }
-
-
     }
 
 

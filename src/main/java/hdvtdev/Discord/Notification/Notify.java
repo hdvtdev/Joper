@@ -1,14 +1,11 @@
 package hdvtdev.Discord.Notification;
 
-import hdvtdev.Discord.BotBuilder;
+import hdvtdev.Discord.DiscordBotBuilder;
 import hdvtdev.Schedule.ClassData;
 import hdvtdev.Schedule.DailyGroupSchedule;
 import hdvtdev.Schedule.ScheduleManager;
 import hdvtdev.Schedule.WeeklyGroupSchedule;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
-import net.dv8tion.jda.api.requests.RestAction;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -28,7 +25,7 @@ public class Notify {
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
         executor.scheduleAtFixedRate(Notify::sendNotification, 0, 1, TimeUnit.SECONDS);
         UserDataManager.addUserData(new UserData("519931644111749131", "216-ИС-23", "вторник"));
-        testNotify();// изменено на 1 минуту
+        testNotify();
     }
 
     public static int checkTime() {
@@ -55,7 +52,7 @@ public class Notify {
             return;
         }
 
-        JDA jda = BotBuilder.getJDA();
+        JDA jda = DiscordBotBuilder.getJDA();
 
         for (UserData ud : UserDataManager.getUserDataFromJSON()) {
 
@@ -88,7 +85,7 @@ public class Notify {
     }
 
     public static void testNotify() {
-        JDA jda = BotBuilder.getJDA();
+        JDA jda = DiscordBotBuilder.getJDA();
 
         System.out.println("отправил1");
 

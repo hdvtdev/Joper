@@ -1,33 +1,31 @@
 package hdvtdev.Discord;
 
 import hdvtdev.Discord.Notification.Notify;
-import hdvtdev.System.ENV;
-import hdvtdev.System.Stats;
+import hdvtdev.Tools.System.ENV;
+import hdvtdev.Tools.System.Stats;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static hdvtdev.Main.sysinfo;
 
-public class BotBuilder {
+
+public class DiscordBotBuilder {
 
     private static JDA jda;
     private static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     private static final StringBuilder activityBuilder = new StringBuilder();
 
-    public static void initialize() {
+    public static void build() {
 
         if (ENV.getDiscordToken().equalsIgnoreCase("YOUR_TOKEN")) {
             System.out.println("[DisBot] [ERROR] Discord token in .env file is undefined");
@@ -37,6 +35,7 @@ public class BotBuilder {
         JDABuilder jdaBuilder = JDABuilder.createLight(ENV.getDiscordToken())
                 .addEventListeners(new EventListener())
                 .setStatus(OnlineStatus.DO_NOT_DISTURB);
+
 
         jda = jdaBuilder.build();
 
@@ -69,7 +68,6 @@ public class BotBuilder {
                         .addChoice("Вся неделя (кроме сб)", "all")
                         ).queue();
 
-
         test();
 
         Stats.startTimeNow();
@@ -79,7 +77,7 @@ public class BotBuilder {
             throw new RuntimeException(e);
         }
 
-        Thread.ofVirtual().start(BotBuilder::updatePresence);
+        Thread.ofVirtual().start(DiscordBotBuilder::updatePresence);
         Notify.initialize();
 
         System.out.println("[DisBot] Loaded all modules. Starting cleanup...");
@@ -98,7 +96,7 @@ public class BotBuilder {
                 .append(Stats.getUptime());
         jda.getPresence().setActivity(Activity.of(Activity.ActivityType.PLAYING, activityBuilder.toString()));
 
-        executorService.schedule(BotBuilder::updatePresence, nextUpdate, TimeUnit.SECONDS);
+        executorService.schedule(DiscordBotBuilder::updatePresence, nextUpdate, TimeUnit.SECONDS);
     }
 
     private static void test() {

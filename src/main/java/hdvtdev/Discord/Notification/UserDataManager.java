@@ -2,6 +2,7 @@ package hdvtdev.Discord.Notification;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import hdvtdev.Tools.Annotations.Experimental;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.io.*;
@@ -9,6 +10,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+@Experimental
+@Deprecated
 public class UserDataManager {
 
     private static final List<UserData> userDataList = new ArrayList<>();
@@ -19,20 +22,18 @@ public class UserDataManager {
     public static void addUserData(SlashCommandInteractionEvent event) {
         UserData userData = new UserData(event.getUser().getId(), event.getOption("group").getAsString(), event.getOption("dayofweek").getAsString());
         userDataList.add(userData);
-        updateUserDataJSON(); // Update the JSON file whenever new data is added
+        updateUserDataJSON();
     }
 
     public static void addUserData(UserData userData) {
         userDataList.add(userData);
-        updateUserDataJSON(); // Update the JSON file whenever new data is added
+        updateUserDataJSON();
     }
 
-    // Method to return user data list
     public static ArrayList<UserData> getUserData() {
         return new ArrayList<>(userDataList);
     }
 
-    // Method to load UserData from JSON file
     public static UserData[] getUserDataFromJSON() {
         try (Reader reader = new FileReader(FILE_PATH)) {
             Type listType = new TypeToken<List<UserData>>() {}.getType();
@@ -42,7 +43,6 @@ public class UserDataManager {
             }
             return userDataList.toArray(new UserData[0]);
         } catch (FileNotFoundException e) {
-            System.out.println("JSON file not found, starting fresh.");
             return new UserData[0];
         } catch (IOException e) {
             System.err.println(e.getMessage());
@@ -50,7 +50,6 @@ public class UserDataManager {
         }
     }
 
-    // Method to update the JSON file with current user data list
     public static void updateUserDataJSON() {
         try (Writer writer = new FileWriter(FILE_PATH)) {
             gson.toJson(userDataList, writer);
@@ -59,9 +58,8 @@ public class UserDataManager {
         }
     }
 
-    // Method to remove user data
     public static void removeUserData(UserData userData) {
         userDataList.remove(userData);
-        updateUserDataJSON(); // Update the JSON file when data is removed
+        updateUserDataJSON();
     }
 }

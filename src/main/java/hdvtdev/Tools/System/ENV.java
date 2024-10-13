@@ -1,4 +1,4 @@
-package hdvtdev.System;
+package hdvtdev.Tools.System;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
