@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class ScheduleManager {
 
-    private static final String pathToEven = "src/main/resources/even.csv";
-    private static final String pathToOdd = "src/main/resources/odd.csv";
+    private static final String pathToEven = "even.csv";
+    private static final String pathToOdd = "odd.csv";
 
     static class Lesson {
         String subject;
@@ -52,7 +52,7 @@ public class ScheduleManager {
         try {
             CSVReader reader = new CSVReader(new FileReader(path));
             String[] nextLine;
-            int lessonNumber = 0;
+            int lessonNumber;
 
             while ((nextLine = reader.readNext()) != null) {
                 if (nextLine.length > 0 && nextLine[0] != null && nextLine[0].startsWith("Группа -")) {

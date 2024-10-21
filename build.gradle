@@ -23,7 +23,13 @@ dependencies {
     }
     implementation 'org.postgresql:postgresql:42.7.4'
     implementation 'com.google.code.gson:gson:2.11.0'
+    compileOnly('org.apache.httpcomponents:httpclient:4.5.14')
+    compileOnly('org.apache.httpcomponents:httpcore:4.4.16')
+    compileOnly('org.apache.httpcomponents:httpclient-cache:4.5.14')
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
+
+
 
 application {
     mainClassName = 'hdvtdev.Main'
