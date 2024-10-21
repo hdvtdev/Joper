@@ -2,7 +2,6 @@ package hdvtdev.Discord;
 
 import hdvtdev.AI.LocalModel;
 import hdvtdev.Discord.Commands.EmbedSchedule;
-import hdvtdev.Discord.Notification.UserDataManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -20,10 +19,12 @@ public class EventListener extends ListenerAdapter {
             return;
 
         if (event.getMessage().getMentions().isMentioned(event.getJDA().getSelfUser())) {
+            System.out.println("11212");
             String msg = event.getMessage().getContentRaw();
             String botMention = "<@" + event.getJDA().getSelfUser().getId() + ">";
             msg = msg.replace(botMention, "").trim();
-            event.getMessage().reply(LocalModel.getResponse(msg)).queue();
+            String response = LocalModel.getResponse(msg, null);
+            event.getMessage().reply(response).queue();
         }
     }
 
@@ -38,7 +39,6 @@ public class EventListener extends ListenerAdapter {
                 System.gc();
             }
             case "schedule" -> schedule(event);
-            case "notify" -> UserDataManager.addUserData(event);
         }
 
 

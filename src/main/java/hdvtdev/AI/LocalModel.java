@@ -1,55 +1,76 @@
 package hdvtdev.AI;
 
 import hdvtdev.Tools.Annotations.Experimental;
+import hdvtdev.Tools.System.ENV;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 
 @Experimental
 public class LocalModel {
 
     @Experimental
-    public static String getResponse(String msg, Object Experimental) {
-        HttpURLConnection conn = null;
-        String s = "";
+    public static String getResponse(String prompt, @Nullable String model) {
+        prompt = "(ограничься 2000 символами)" + prompt;
+        if (model == null) model = "qwen2.5:3b";
+        String textResponse = "no response";
+        String url = ENV.getServerURL();
+
         try {
-            URL url = new URL("http://localhost:5000/api/response");
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "text/plain");
-            conn.setDoOutput(true);
 
-            try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = msg.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
 
-            StringBuilder response = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim()).append("\n");
-                }
-            }
+            String requestBody = String.format("""
+    {
+        "model": "%s",
+        "prompt": "%s",
+        "stream": false
+    }
+    """, model, prompt);
 
-            s = response.toString().trim();
+            HttpClient client = HttpClient.newHttpClient();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            client.close();
+
+            textResponse = response.body();
+            System.out.println("[AI] Response ready.");
+
         } catch (Exception e) {
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
+            System.err.println(e.getMessage());
         }
-        return s;
+        return toHumanFormat(textResponse);
     }
 
-    public static void launchModel() {
-        System.out.println("[INFO] Launching model...");
-        ProcessBuilder processBuilder = new ProcessBuilder("python", "LocalModelAPI.py");
-        try {processBuilder.start().waitFor();} catch (Exception e) {System.err.println(e.getMessage());}
+    private static String toHumanFormat(String response) {
+
+        String key = "\"response\":\"";
+        int startIndex = response.indexOf(key);
+        if (startIndex != -1) {
+            startIndex += key.length();
+            int endIndex = response.indexOf("\"", startIndex);
+            if (endIndex != -1) {
+                response = response.substring(startIndex, endIndex);
+            }
+        }
+
+        String[] parts = response.split("\\\\n");
+        StringBuilder responseBuilder = new StringBuilder();
+        for (String part : parts) {
+            responseBuilder.append(part).append("\n");
+        }
+        response = responseBuilder.toString();
+
+        return response.replaceAll("\n", " ");
     }
 
 }

@@ -9,8 +9,8 @@ public class ENV {
         return dotenv.get("DISCORD_TOKEN");
     }
 
-    public static String getOpenAIkey() {
-        return dotenv.get("OPENAI_KEY");
+    public static String getServerURL() {
+        return dotenv.get("SERVER_URL");
     }
 
 }
